@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+
+.streamlit/
+
+venv/
+.env
+
+.faiss
+.pkl
+
+.DS_Store
