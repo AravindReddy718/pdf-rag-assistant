@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+ollama
+pypdf
+faiss-cpu
+numpy

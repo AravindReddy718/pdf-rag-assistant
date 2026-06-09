@@ -10,3 +10,5 @@ venv/
 .pkl
 
 .DS_Store
+
+archive/
