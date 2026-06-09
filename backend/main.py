@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from ollama import chat
 from pypdf import PdfReader
 from io import BytesIO
+from fastapi.middleware.cors import CORSMiddleware
 from rag import (
     chunk_text,
     create_embeddings,
@@ -18,6 +19,19 @@ chunks = []
 faiss_index = None
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+
+    allow_origins=[
+        "http://localhost:5173"
+    ],
+
+    allow_credentials=True,
+
+    allow_methods=["*"],
+
+    allow_headers=["*"],
+)
 @app.post("/upload")
 async def upload_pdf(
     file: UploadFile
