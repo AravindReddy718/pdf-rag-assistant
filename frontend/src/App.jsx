@@ -2,6 +2,39 @@ import { useState } from "react"
 function App() {
   const [message, setMessage] = useState("")
   const [messages, setMessages] = useState([])
+  const [file, setFile] = useState(null)
+  const [uploadStatus, setUploadStatus]= useState("")
+  const [loading, setLoading] =useState(false)
+  async function uploadPDF() {
+
+  if (!file) {
+    return
+  }
+
+  const formData = new FormData()
+
+  formData.append(
+    "file",
+    file
+  )
+
+  const response = await fetch(
+    "http://127.0.0.1:8000/upload",
+    {
+      method: "POST",
+      body: formData
+    }
+  )
+
+  const data =
+    await response.json()
+
+  setUploadStatus(
+  "PDF uploaded successfully"
+  )
+  
+}
+
   async function sendMessage() {
 
   if (!message.trim()) {
@@ -12,11 +45,11 @@ function App() {
   content: message
   }
 
-  setMessages([
-    ...messages,
-    userMessage
+  setMessages(prev => [
+  ...prev,
+  userMessage
   ])
-
+  setLoading(true)
   const response = await fetch(
   "http://127.0.0.1:8000/chat",
   {
@@ -44,6 +77,7 @@ function App() {
 
   ])
 
+  setLoading(false)
   setMessage("")
   }
   return (
@@ -52,26 +86,26 @@ function App() {
 
       <hr />
 
-      <button>
+      <input
+        type="file"
+        accept=".pdf"
+        onChange={(e) => setFile(e.target.files[0])}
+      />
+      <button
+        onClick={uploadPDF}
+      >
         Upload PDF
       </button>
+      <p>{uploadStatus}</p>
 
       <hr />
-
-      <div>
-        <p>
-          <strong>User:</strong>
-          What is his CGPA?
-        </p>
-
-        <p>
-          <strong>Bot:</strong>
-          His B.Tech CGPA is 9.01/10.
-        </p>
-      </div>
+     
 
       <hr />
-
+      {
+        loading &&
+        <p>Thinking...</p>
+      }
       <input
         type="text"
         placeholder="Ask a question..."
@@ -82,12 +116,27 @@ function App() {
       />
       {messages.map((msg, index) => (
 
-        <p key={index}>
-          <strong>
-            {msg.role}:
-          </strong>{" "}
+        <div
+          key={index}
+          style={{
+            padding: "10px",
+            margin: "10px",
+            borderRadius: "10px",
+            backgroundColor:
+              msg.role === "user"
+                ? "#2563eb"
+                : "#1f2937",
+
+            maxWidth: "70%",
+
+            marginLeft:
+              msg.role === "user"
+                ? "auto"
+                : "0",
+          }}
+        >
           {msg.content}
-        </p>
+        </div>
 
       ))}
           
