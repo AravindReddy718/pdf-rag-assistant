@@ -36,10 +36,21 @@ function App() {
     setPdfs] =
     useState([])
 
-  useEffect(() => {
-    loadPdfs()
-  }, [])
+  const [chats,
+  setChats] =
+  useState([])
 
+  const [currentChat,
+  setCurrentChat] =
+  useState(null)  
+
+  useEffect(() => {
+
+  loadPdfs()
+
+  loadChats()
+
+}, [])
   async function loadPdfs() {
 
     try {
@@ -66,7 +77,109 @@ function App() {
 
   }
 
+  async function loadChats() {
+
+  try {
+
+    const response =
+      await fetch(
+        "http://127.0.0.1:8000/chats"
+      )
+
+    const data =
+      await response.json()
+
+    setChats(
+      data.chats || []
+    )
+
+  } catch {
+
+    console.log(
+      "Failed to load chats"
+    )
+
+  }
+
+}
+
+async function loadChat(
+  chatId
+) {
+
+  try {
+
+    const response =
+      await fetch(
+        `http://127.0.0.1:8000/chat/${chatId}`
+      )
+
+    const data =
+      await response.json()
+
+    setMessages(
+      data.history || []
+    )
+
+    setPdfs(
+      data.pdfs || []
+    )
+
+  } catch {
+
+    console.log(
+      "Failed to load chat"
+    )
+
+  }
+
+}
+
+  async function createChat() {
+
+  try {
+
+    const response =
+      await fetch(
+        "http://127.0.0.1:8000/chat/new",
+        {
+          method: "POST"
+        }
+      )
+
+    const data =
+      await response.json()
+
+    await loadChats()
+
+    setCurrentChat(
+      data.chat_id
+    )
+    setMessages([])
+
+setPdfs([])
+
+  } catch {
+
+    console.log(
+      "Failed to create chat"
+    )
+
+  }
+
+}
+
   async function uploadPDF() {
+
+    if (!currentChat) {
+
+  setUploadStatus(
+    "Please create or select a chat first."
+  )
+
+  return
+
+}
 
     if (!file) return
 
@@ -82,7 +195,7 @@ function App() {
 
       const response =
         await fetch(
-          "http://127.0.0.1:8000/upload",
+          `http://127.0.0.1:8000/upload/${currentChat}`,
           {
             method: "POST",
             body: formData
@@ -110,6 +223,25 @@ function App() {
   }
 
   async function sendMessage() {
+    if (!currentChat) {
+
+  setMessages(prev => [
+
+    ...prev,
+
+    {
+      role:
+      "assistant",
+
+      content:
+      "Please select a chat first."
+    }
+
+  ])
+
+  return
+
+}
 
     if (!message.trim())
       return
@@ -133,7 +265,7 @@ function App() {
 
       const response =
         await fetch(
-          "http://127.0.0.1:8000/chat",
+          `http://127.0.0.1:8000/chat/${currentChat}`,
           {
             method: "POST",
             headers: {
@@ -190,43 +322,102 @@ function App() {
 
           <div className="sidebar">
 
-            <h2>
-              📚 PDFs
-            </h2>
+  <button
+    className="upload-btn"
+    onClick={createChat}
+    style={{
+      width: "100%",
+      marginBottom: "20px"
+    }}
+  >
+    ➕ New Chat
+  </button>
 
-            {
-              pdfs.length === 0
-              ? (
-                <p>
-                  No PDFs uploaded
-                </p>
-              )
-              : (
-                pdfs.map(
-                  (
-                    pdf,
-                    index
-                  ) => (
+  <h3>
+    💬 Chats
+  </h3>
 
-                    <div
-                      key={index}
-                      className="pdf-item"
-                    >
-                      📄 {pdf}
-                    </div>
+  {
+    chats.map(
+      chat => (
 
-                  )
-                )
-              )
-            }
+        <div
+          key={chat.id}
 
+          onClick={() => {
+
+            setCurrentChat(
+              chat.id 
+            )
+
+            loadChat(
+              chat.id
+            )
+
+          }}
+
+          className="pdf-item"
+
+          style={{
+            background:
+              currentChat === chat.id
+                ? "#2563eb"
+                : ""
+          }}
+        >
+
+          💬 {chat.title}
+
+        </div>
+
+      )
+    )
+  }
+
+  <hr
+    style={{
+      margin: "20px 0"
+    }}
+  />
+
+  <h3>
+    📚 PDFs
+  </h3>
+
+  {
+    pdfs.length === 0
+    ? (
+      <p>
+        No PDFs uploaded
+      </p>
+    )
+    : (
+      pdfs.map(
+        (
+          pdf,
+          index
+        ) => (
+
+          <div
+            key={index}
+            className="pdf-item"
+          >
+            📄 {pdf}
           </div>
+
+        )
+      )
+    )
+  }
+
+</div>
 
           <div className="main-content">
 
             <h1 className="title">
               🤖 PDF RAG Assistant
             </h1>
+ 
 
             <p className="subtitle">
               Chat with your PDFs
