@@ -1,0 +1,32 @@
+.chat-window {
+  background: rgba(30, 41, 59, 0.8);
+
+  backdrop-filter: blur(12px);
+
+  border: 1px solid #334155;
+
+  border-radius: 20px;
+
+  padding: 20px;
+
+  height: 500px;
+
+  overflow-y: auto;
+
+  box-shadow:
+    0 8px 30px rgba(
+      0,
+      0,
+      0,
+      0.35
+    );
+}
+
+.empty-state {
+  color: #94a3b8;
+}
+
+.loading {
+  color: #94a3b8;
+  margin-top: 10px;
+}

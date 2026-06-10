@@ -1,38 +1,71 @@
+import "./MessageBubble.css"
+
 function MessageBubble({
   role,
-  content
+  content,
+  sources = []
 }) {
   return (
     <div
-      style={{
-        display: "flex",
-        justifyContent:
-          role === "user"
-            ? "flex-end"
-            : "flex-start",
-      }}
+      className={`message-row ${role}`}
     >
       <div
-        style={{
-          backgroundColor:
-            role === "user"
-              ? "#2563eb"
-              : "#334155",
-
-          padding: "12px 16px",
-
-          borderRadius: "14px",
-
-          margin: "8px 0",
-
-          maxWidth: "75%",
-
-          lineHeight: "1.6",
-
-          color: "white",
-        }}
+        className={`message-bubble ${role}`}
       >
-        {content}
+        <div>
+          {content}
+        </div>
+
+        {
+          role === "assistant" &&
+          sources.length > 0 && (
+            <div
+              style={{
+                marginTop: "14px",
+                paddingTop: "10px",
+                borderTop:
+                  "1px solid rgba(255,255,255,0.15)",
+                fontSize: "14px"
+              }}
+            >
+              <div
+                style={{
+                  fontWeight: "600",
+                  marginBottom: "6px"
+                }}
+              >
+                📄 Sources
+              </div>
+
+              {
+                sources.map(
+                  (
+                    source,
+                    index
+                  ) => (
+                    <div
+                      key={index}
+                      style={{
+                        marginBottom:
+                          "4px"
+                      }}
+                    >
+                      {source.pdf}
+                      {" "}
+                      (
+                      Pages{" "}
+                      {source.pages.join(
+                        ", "
+                      )}
+                      )
+                    </div>
+                  )
+                )
+              }
+            </div>
+          )
+        }
+
       </div>
     </div>
   )

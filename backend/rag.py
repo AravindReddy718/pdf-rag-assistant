@@ -1,4 +1,3 @@
-# rag.py
 from ollama import embeddings
 import faiss
 import numpy as np
@@ -53,7 +52,6 @@ def create_embeddings(chunks):
     return chunk_embeddings
 
 
-
 def create_faiss_index(
     chunk_embeddings
 ):
@@ -78,19 +76,20 @@ def create_faiss_index(
     return index
 
 
-
-def retrieve_chunks(
+def retrieve_documents(
     question,
     index,
-    chunks,
+    documents,
     k=3
 ):
 
     question_embedding = np.array(
-        [embeddings(
-            model="nomic-embed-text",
-            prompt=question
-        )["embedding"]],
+        [
+            embeddings(
+                model="nomic-embed-text",
+                prompt=question
+            )["embedding"]
+        ],
         dtype=np.float32
     )
 
@@ -103,12 +102,12 @@ def retrieve_chunks(
         k
     )
 
-    retrieved_chunks = [
+    retrieved_documents = [
 
-        chunks[i]
+        documents[i]
 
         for i in indices[0]
 
     ]
 
-    return retrieved_chunks
+    return retrieved_documents

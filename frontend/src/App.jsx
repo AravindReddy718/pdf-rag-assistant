@@ -1,70 +1,151 @@
-import { useState } from "react"
-import { Upload, Send, FileText } from "lucide-react"
+import {
+  useState,
+  useEffect
+} from "react"
+
+import {
+  Upload,
+  Send,
+  FileText
+} from "lucide-react"
+
 import ChatWindow from "./components/ChatWindow"
 
+import "./App.css"
+
 function App() {
-  const [message, setMessage] = useState("")
-  const [messages, setMessages] = useState([])
-  const [file, setFile] = useState(null)
-  const [uploadStatus, setUploadStatus] = useState("")
-  const [loading, setLoading] = useState(false)
 
-  async function uploadPDF() {
-    if (!file) return
+  const [message, setMessage] =
+    useState("")
 
-    const formData = new FormData()
+  const [messages, setMessages] =
+    useState([])
 
-    formData.append("file", file)
+  const [file, setFile] =
+    useState(null)
+
+  const [uploadStatus,
+    setUploadStatus] =
+    useState("")
+
+  const [loading,
+    setLoading] =
+    useState(false)
+
+  const [pdfs,
+    setPdfs] =
+    useState([])
+
+  useEffect(() => {
+    loadPdfs()
+  }, [])
+
+  async function loadPdfs() {
 
     try {
-      await fetch(
-        "http://127.0.0.1:8000/upload",
-        {
-          method: "POST",
-          body: formData,
-        }
+
+      const response =
+        await fetch(
+          "http://127.0.0.1:8000/pdfs"
+        )
+
+      const data =
+        await response.json()
+
+      setPdfs(
+        data.pdfs || []
       )
 
+    } catch {
+
+      console.log(
+        "Failed to load PDFs"
+      )
+
+    }
+
+  }
+
+  async function uploadPDF() {
+
+    if (!file) return
+
+    const formData =
+      new FormData()
+
+    formData.append(
+      "file",
+      file
+    )
+
+    try {
+
+      const response =
+        await fetch(
+          "http://127.0.0.1:8000/upload",
+          {
+            method: "POST",
+            body: formData
+          }
+        )
+
+      const data =
+        await response.json()
+
       setUploadStatus(
+        data.message ||
         `${file.name} uploaded successfully`
       )
+
+      await loadPdfs()
+
     } catch {
+
       setUploadStatus(
         "Upload failed"
       )
+
     }
+
   }
 
   async function sendMessage() {
-    if (!message.trim()) return
 
-    const currentMessage = message
+    if (!message.trim())
+      return
+
+    const currentMessage =
+      message
 
     setMessages(prev => [
       ...prev,
       {
         role: "user",
-        content: currentMessage,
-      },
+        content:
+          currentMessage
+      }
     ])
 
     setMessage("")
     setLoading(true)
 
     try {
-      const response = await fetch(
-        "http://127.0.0.1:8000/chat",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-          body: JSON.stringify({
-            message: currentMessage,
-          }),
-        }
-      )
+
+      const response =
+        await fetch(
+          "http://127.0.0.1:8000/chat",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+            body: JSON.stringify({
+              message:
+                currentMessage
+            })
+          }
+        )
 
       const data =
         await response.json()
@@ -72,197 +153,189 @@ function App() {
       setMessages(prev => [
         ...prev,
         {
-          role: "assistant",
-          content: data.response,
-        },
+          role:
+            "assistant",
+          content:
+            data.response,
+          sources:
+            data.sources || []
+        }
       ])
+
     } catch {
+
       setMessages(prev => [
         ...prev,
         {
-          role: "assistant",
+          role:
+            "assistant",
           content:
-            "Something went wrong.",
-        },
+            "Server error."
+        }
       ])
+
     }
 
     setLoading(false)
+
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background:
-          "linear-gradient(180deg,#0f172a,#111827)",
-        color: "white",
-        padding: "30px",
-        fontFamily:
-          "Inter, sans-serif",
-      }}
-    >
-      <div
-        style={{
-          maxWidth: "1000px",
-          margin: "0 auto",
-        }}
-      >
-        <h1
-          style={{
-            textAlign: "center",
-            fontSize: "42px",
-            marginBottom: "10px",
-          }}
-        >
-          🤖 PDF RAG Assistant
-        </h1>
 
-        <p
-          style={{
-            textAlign: "center",
-            color: "#94a3b8",
-            marginBottom: "30px",
-          }}
-        >
-          Chat with your PDFs using
-          FAISS • Ollama • Qwen
-        </p>
+    <div className="app">
 
-        <div
-          style={{
-            backgroundColor:
-              "#1e293b",
-            borderRadius: "18px",
-            padding: "20px",
-            marginBottom: "20px",
-            boxShadow:
-              "0 4px 20px rgba(0,0,0,0.25)",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              gap: "12px",
-              alignItems: "center",
-            }}
-          >
-            <input
-              type="file"
-              accept=".pdf"
-              onChange={(e) =>
-                setFile(
-                  e.target.files[0]
+      <div className="container">
+
+        <div className="layout">
+
+          <div className="sidebar">
+
+            <h2>
+              📚 PDFs
+            </h2>
+
+            {
+              pdfs.length === 0
+              ? (
+                <p>
+                  No PDFs uploaded
+                </p>
+              )
+              : (
+                pdfs.map(
+                  (
+                    pdf,
+                    index
+                  ) => (
+
+                    <div
+                      key={index}
+                      className="pdf-item"
+                    >
+                      📄 {pdf}
+                    </div>
+
+                  )
                 )
+              )
+            }
+
+          </div>
+
+          <div className="main-content">
+
+            <h1 className="title">
+              🤖 PDF RAG Assistant
+            </h1>
+
+            <p className="subtitle">
+              Chat with your PDFs
+              using FAISS •
+              Ollama • Qwen
+            </p>
+
+            <div className="upload-card">
+
+              <div className="upload-row">
+
+                <input
+                  type="file"
+                  accept=".pdf"
+                  onChange={(e) =>
+                    setFile(
+                      e.target.files[0]
+                    )
+                  }
+                />
+
+                <button
+                  className="upload-btn"
+                  onClick={
+                    uploadPDF
+                  }
+                >
+                  <Upload size={18}/>
+                  Upload
+                </button>
+
+              </div>
+
+              {
+                uploadStatus && (
+
+                  <div
+                    className="upload-status"
+                  >
+
+                    <FileText
+                      size={18}
+                    />
+
+                    {uploadStatus}
+
+                  </div>
+
+                )
+              }
+
+            </div>
+
+            <ChatWindow
+              messages={
+                messages
+              }
+              loading={
+                loading
               }
             />
 
-            <button
-              onClick={uploadPDF}
-              style={{
-                backgroundColor:
-                  "#2563eb",
-                border: "none",
-                color: "white",
-                padding:
-                  "10px 18px",
-                borderRadius:
-                  "10px",
-                cursor: "pointer",
-                display: "flex",
-                gap: "8px",
-                alignItems:
-                  "center",
-              }}
-            >
-              <Upload size={18} />
-              Upload
-            </button>
+            <div className="input-row">
+
+              <input
+                className="chat-input"
+                type="text"
+                placeholder="Ask a question..."
+                value={message}
+                onChange={(e) =>
+                  setMessage(
+                    e.target.value
+                  )
+                }
+                onKeyDown={(e) => {
+
+                  if (
+                    e.key ===
+                    "Enter"
+                  ) {
+
+                    sendMessage()
+
+                  }
+
+                }}
+              />
+
+              <button
+                className="send-btn"
+                onClick={
+                  sendMessage
+                }
+              >
+                <Send size={18}/>
+              </button>
+
+            </div>
+
           </div>
 
-          {uploadStatus && (
-            <div
-              style={{
-                marginTop: "15px",
-                color: "#22c55e",
-                display: "flex",
-                alignItems:
-                  "center",
-                gap: "8px",
-              }}
-            >
-              <FileText
-                size={18}
-              />
-              {uploadStatus}
-            </div>
-          )}
         </div>
 
-        <ChatWindow
-          messages={messages}
-          loading={loading}
-        />
-
-        <div
-          style={{
-            display: "flex",
-            gap: "12px",
-            marginTop: "20px",
-          }}
-        >
-          <input
-            type="text"
-            placeholder="Ask a question about the uploaded PDF..."
-            value={message}
-            onChange={(e) =>
-              setMessage(
-                e.target.value
-              )
-            }
-            onKeyDown={(e) => {
-              if (
-                e.key === "Enter"
-              ) {
-                sendMessage()
-              }
-            }}
-            style={{
-              flex: 1,
-              padding: "16px",
-              borderRadius:
-                "14px",
-              border:
-                "1px solid #334155",
-              backgroundColor:
-                "#1e293b",
-              color: "white",
-              outline: "none",
-            }}
-          />
-
-          <button
-            onClick={
-              sendMessage
-            }
-            disabled={loading}
-            style={{
-              backgroundColor:
-                "#2563eb",
-              border: "none",
-              color: "white",
-              width: "60px",
-              borderRadius:
-                "14px",
-              cursor: "pointer",
-            }}
-          >
-            <Send size={20} />
-          </button>
-        </div>
       </div>
+
     </div>
+
   )
+
 }
 
 export default App

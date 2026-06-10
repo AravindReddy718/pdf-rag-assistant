@@ -1,42 +1,34 @@
+import "./ChatWindow.css"
+
 import MessageBubble from "./MessageBubble"
-import { useEffect, useRef } from "react"
+
+import {
+  useEffect,
+  useRef
+} from "react"
 
 function ChatWindow({
   messages,
   loading
 }) {
-    const bottomRef = useRef(null)
 
-        useEffect(() => {
+  const bottomRef =
+    useRef(null)
 
-        bottomRef.current?.scrollIntoView({
-            behavior: "smooth"
-        })
+  useEffect(() => {
 
-        }, [messages])
+    bottomRef.current
+      ?.scrollIntoView({
+        behavior: "smooth"
+      })
+
+  }, [messages])
+
   return (
-    <div
-      style={{
-        backgroundColor:
-          "#1e293b",
+    <div className="chat-window">
 
-        borderRadius: "16px",
-
-        padding: "20px",
-
-        height: "500px",
-
-        marginBottom: "20px",
-
-        overflowY: "auto",
-      }}
-    >
       {messages.length === 0 && (
-        <p
-          style={{
-            color: "#94a3b8",
-          }}
-        >
+        <p className="empty-state">
           Upload a PDF and
           start chatting...
         </p>
@@ -44,26 +36,29 @@ function ChatWindow({
 
       {messages.map(
         (msg, index) => (
+
           <MessageBubble
             key={index}
             role={msg.role}
             content={
               msg.content
             }
+            sources={
+              msg.sources || []
+            }
           />
+
         )
       )}
 
       {loading && (
-        <p
-          style={{
-            color: "#94a3b8",
-          }}
-        >
+        <p className="loading">
           Thinking...
         </p>
       )}
-        <div ref={bottomRef} />
+
+      <div ref={bottomRef}></div>
+
     </div>
   )
 }
