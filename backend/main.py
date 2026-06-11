@@ -595,9 +595,47 @@ Context:
     if (
     chat_data["title"]
     == "New Chat"
-    ):
+):
+
+        title_response = chat(
+
+            model="qwen3:4b",
+
+            messages=[
+
+                {
+                    "role":
+                    "system",
+
+                    "content":
+                    """
+    Generate a short chat title.
+
+    Rules:
+    - 2 to 5 words
+    - No punctuation
+    - No quotes
+    - Return title only
+    """
+                },
+
+                {
+                    "role":
+                    "user",
+
+                    "content":
+                    request.message
+                }
+
+            ]
+
+        )
+
         chat_data["title"] = (
-            request.message[:30]
+            title_response
+            .message
+            .content
+            .strip()
         )
 
     chat_data[

@@ -169,6 +169,47 @@ setPdfs([])
 
 }
 
+  async function deleteChat(
+  chatId
+) {
+
+  const response =
+    await fetch(
+      `http://127.0.0.1:8000/chat/${chatId}`,
+      {
+        method:
+          "DELETE"
+      }
+    )
+
+  const data =
+    await response.json()
+
+  if (
+    data.message
+  ) {
+
+    await loadChats()
+
+    if (
+      currentChat ===
+      chatId
+    ) {
+
+      setCurrentChat(
+        null
+      )
+
+      setMessages([])
+
+      setPdfs([])
+
+    }
+
+  }
+
+}
+
   async function uploadPDF() {
 
     if (!currentChat) {
@@ -293,7 +334,7 @@ setPdfs([])
             data.sources || []
         }
       ])
-
+      await loadChats()
     } catch {
 
       setMessages(prev => [
@@ -337,17 +378,35 @@ setPdfs([])
     💬 Chats
   </h3>
 
-  {
-    chats.map(
-      chat => (
+{
+  chats.map(
+    chat => (
 
-        <div
-          key={chat.id}
+      <div
+        key={chat.id}
 
+        className="pdf-item"
+
+        style={{
+          display: "flex",
+          justifyContent:
+            "space-between",
+          alignItems:
+            "center",
+
+          background:
+            currentChat ===
+            chat.id
+              ? "#2563eb"
+              : ""
+        }}
+      >
+
+        <span
           onClick={() => {
 
             setCurrentChat(
-              chat.id 
+              chat.id
             )
 
             loadChat(
@@ -355,24 +414,37 @@ setPdfs([])
             )
 
           }}
-
-          className="pdf-item"
-
           style={{
-            background:
-              currentChat === chat.id
-                ? "#2563eb"
-                : ""
+            flex: 1,
+            cursor: "pointer"
           }}
         >
 
           💬 {chat.title}
 
-        </div>
+        </span>
 
-      )
+        <span
+          onClick={() =>
+            deleteChat(
+              chat.id
+            )
+          }
+          style={{
+            cursor:
+              "pointer"
+          }}
+        >
+
+          🗑
+
+        </span>
+
+      </div>
+
     )
-  }
+  )
+}
 
   <hr
     style={{
