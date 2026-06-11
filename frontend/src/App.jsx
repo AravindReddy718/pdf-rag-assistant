@@ -6,7 +6,11 @@ import {
 import {
   Upload,
   Send,
-  FileText
+  FileText,
+  Pencil,
+  Trash2,
+  MessageSquare,
+  Plus
 } from "lucide-react"
 
 import ChatWindow from "./components/ChatWindow"
@@ -405,19 +409,24 @@ setPdfs([])
 
           <div className="sidebar">
 
-  <button
-    className="upload-btn"
-    onClick={createChat}
-    style={{
-      width: "100%",
-      marginBottom: "20px"
-    }}
-  >
-    ➕ New Chat
-  </button>
+<button
+  className="upload-btn"
+  onClick={createChat}
+  style={{
+    width: "100%",
+    marginBottom: "20px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "8px"
+  }}
+>
+  <Plus size={16}/>
+  <span>New Chat</span>
+</button>
 
   <h3>
-    💬 Chats
+    <MessageSquare size={16} /> Chats
   </h3>
 
 {
@@ -462,7 +471,7 @@ setPdfs([])
           }}
         >
 
-          💬 {chat.title}
+          <MessageSquare size={16} /> {chat.title}
 
         </span>
         <span
@@ -491,7 +500,7 @@ setPdfs([])
 
 >
 
-  ✏️
+  <Pencil size={16} />
 
 </span>
 
@@ -507,7 +516,7 @@ setPdfs([])
           }}
         >
 
-          🗑
+          <Trash2 size={16} />
 
         </span>
 
@@ -524,7 +533,7 @@ setPdfs([])
   />
 
   <h3>
-    📚 PDFs
+    <FileText size={16} /> PDFs
   </h3>
 
   {
@@ -545,7 +554,7 @@ setPdfs([])
             key={index}
             className="pdf-item"
           >
-            📄 {pdf}
+            <FileText size={16} /> {pdf}
           </div>
 
         )
@@ -558,7 +567,7 @@ setPdfs([])
           <div className="main-content">
 
             <h1 className="title">
-              🤖 PDF RAG Assistant
+              PDF RAG Assistant
             </h1>
  
 
