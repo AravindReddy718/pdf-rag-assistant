@@ -52,3 +52,6 @@ Misc
 *.njsproj
 *.sln
 *.sw?
+
+backend/uploads/
+backend/chats.json
