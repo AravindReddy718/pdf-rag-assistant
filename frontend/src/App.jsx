@@ -263,6 +263,48 @@ setPdfs([])
 
   }
 
+  async function renameChat(
+  chatId
+) {
+
+  const title =
+    prompt(
+      "Enter new chat title"
+    )
+
+  if (!title)
+    return
+
+  await fetch(
+
+    `http://127.0.0.1:8000/chat/${chatId}/rename`,
+
+    {
+
+      method: "PUT",
+
+      headers: {
+
+        "Content-Type":
+        "application/json"
+
+      },
+
+      body:
+      JSON.stringify({
+
+        title
+
+      })
+
+    }
+
+  )
+
+  await loadChats()
+
+}
+
   async function sendMessage() {
     if (!currentChat) {
 
@@ -423,6 +465,35 @@ setPdfs([])
           💬 {chat.title}
 
         </span>
+        <span
+
+  onClick={() =>
+
+    renameChat(
+
+      chat.id
+
+    )
+
+  }
+
+  style={{
+
+    cursor:
+
+    "pointer",
+
+    marginRight:
+
+    "10px"
+
+  }}
+
+>
+
+  ✏️
+
+</span>
 
         <span
           onClick={() =>

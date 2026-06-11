@@ -4,6 +4,10 @@ from ollama import chat
 from pypdf import PdfReader
 from io import BytesIO
 from fastapi.middleware.cors import CORSMiddleware
+from persistence import (
+    save_chats,
+    load_chats
+)
 
 import faiss
 import numpy as np
@@ -22,14 +26,22 @@ class ChatRequest(BaseModel):
 class ChatUploadRequest(BaseModel):
     chat_id: str
 
+class RenameChatRequest(
+    BaseModel
+):
+    title: str    
+
 documents = []
 chunk_embeddings = []
 faiss_index = None
 uploaded_pdfs = set()
 
 # NEW
-chats = {}
-chat_counter = 0
+chats = load_chats()
+chat_counter = len(
+    chats
+)
+
 
 
 app = FastAPI()
@@ -68,10 +80,44 @@ def create_chat():
         "title": "New Chat"
 
     }
+    save_chats(
+    chats
+)
 
     return {
         "chat_id":
         chat_id
+    }
+
+@app.put(
+    "/chat/{chat_id}/rename"
+)
+def rename_chat(
+    chat_id: str,
+    request:
+    RenameChatRequest
+):
+
+    if chat_id not in chats:
+
+        return {
+            "error":
+            "Chat not found"
+        }
+
+    chats[
+        chat_id
+    ]["title"] = (
+        request.title
+    )
+
+    save_chats(
+        chats
+    )
+
+    return {
+        "message":
+        "Chat renamed"
     }
 
 @app.get("/chats")
@@ -146,6 +192,9 @@ def delete_chat(
     del chats[
         chat_id
     ]
+    save_chats(
+    chats
+)
 
     return {
         "message":
@@ -649,6 +698,9 @@ Context:
             response.message.content
         }
     )
+    save_chats(
+    chats
+)
 
     return {
 
