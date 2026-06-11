@@ -43,16 +43,127 @@ chats = load_chats()
 chat_counter = len(
     chats
 )
-
-
-
-app = FastAPI()
 UPLOADS_DIR = "uploads"
 
 os.makedirs(
     UPLOADS_DIR,
     exist_ok=True
 )
+
+def rebuild_chat_data():
+
+    for chat_id in chats:
+
+        chat_data = chats[
+            chat_id
+        ]
+
+        chat_data[
+            "documents"
+        ] = []
+
+        chat_data[
+            "pdfs"
+        ] = set()
+
+        chat_data[
+            "faiss_index"
+        ] = None
+
+        chat_folder = os.path.join(
+            UPLOADS_DIR,
+            chat_id
+        )
+
+        if not os.path.exists(
+            chat_folder
+        ):
+            continue
+
+        all_chunks = []
+
+        for filename in os.listdir(
+            chat_folder
+        ):
+
+            if not filename.endswith(
+                ".pdf"
+            ):
+                continue
+
+            pdf_path = os.path.join(
+                chat_folder,
+                filename
+            )
+
+            reader = PdfReader(
+                pdf_path
+            )
+
+            chat_data[
+                "pdfs"
+            ].add(
+                filename
+            )
+
+            for page_number, page in enumerate(
+                reader.pages,
+                start=1
+            ):
+
+                page_text = (
+                    page.extract_text()
+                )
+
+                if not page_text:
+                    continue
+
+                page_chunks = chunk_text(
+                    page_text
+                )
+
+                for chunk in page_chunks:
+
+                    chat_data[
+                        "documents"
+                    ].append(
+                        {
+                            "text":
+                            chunk,
+
+                            "source":
+                            filename,
+
+                            "page":
+                            page_number
+                        }
+                    )
+
+                    all_chunks.append(
+                        chunk
+                    )
+
+        if len(all_chunks) > 0:
+
+            embeddings = (
+                create_embeddings(
+                    all_chunks
+                )
+            )
+
+            chat_data[
+                "faiss_index"
+            ] = (
+                create_faiss_index(
+                    embeddings
+                )
+            )
+
+
+
+app = FastAPI()
+
+rebuild_chat_data()
 
 app.add_middleware(
     CORSMiddleware,

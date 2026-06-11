@@ -9,6 +9,14 @@
             {
                 "role": "assistant",
                 "content": "Based on the provided context, a process is defined as:\n\n\"A process is an instance of a program in execution. It needs certain resources to accomplish its tasks such as CPU, RAM, and I/O devices, and these resources are allocated to the process while it is being executed. The program itself is not a passive entity but an instance of the program (when loaded onto RAM) is called the process.\"\n\nThe context also explains that a process is divided into four components:\n- Stack: Holds temporary data (functions, parameters and local variables)\n- Heap: Dynamically allocates memory during runtime\n- Text: Contains code\n- Data: Contains global variables and static variables\n\nThe process is described as an active entity (unlike a program which is passive), and you cannot \"carry a process on storage media\" but can store a program."
+            },
+            {
+                "role": "user",
+                "content": "what is a process"
+            },
+            {
+                "role": "assistant",
+                "content": "I could not find that information in the document."
             }
         ]
     }
