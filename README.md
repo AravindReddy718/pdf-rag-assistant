@@ -1,17 +1,44 @@
 PDF RAG Assistant
 
-A Retrieval-Augmented Generation (RAG) chatbot backend built using FastAPI, FAISS, Ollama, and local embedding models.
+A multi-workspace Retrieval-Augmented Generation (RAG) application built with React, FastAPI, FAISS, Ollama, and Qwen. The application allows users to create independent chat workspaces, upload PDFs to specific chats, and ask questions grounded in uploaded documents.
 
 Features
 
-* Upload PDF documents through API endpoints
-* Automatic PDF text extraction
+Multi-Workspace Chats
+
+* Create multiple chat workspaces
+* Independent PDF collections per chat
+* Chat-specific retrieval and memory
+* Rename and delete chats
+
+PDF Processing
+
+* Upload PDFs to individual workspaces
+* Automatic text extraction using PyPDF
 * Paragraph-based document chunking
 * Semantic embeddings using Nomic Embed Text
+
+Retrieval-Augmented Generation
+
 * Vector similarity search using FAISS
-* Retrieval-Augmented Generation (RAG)
-* Local LLM inference using Qwen 3 via Ollama
-* Context-aware question answering from uploaded documents
+* Context-aware retrieval
+* Source citations with PDF and page references
+* Local inference using Qwen 3 via Ollama
+
+Persistence
+
+* Chat history persistence
+* Chat title persistence
+* PDF persistence
+* Automatic FAISS index rebuilding on startup
+
+User Interface
+
+* React frontend
+* Dark mode UI
+* Chat sidebar navigation
+* Workspace management
+* PDF explorer panel
 
 Architecture
 
@@ -23,32 +50,27 @@ Chunking
 ↓
 Embeddings (Nomic Embed Text)
 ↓
-FAISS Vector Index
+FAISS Vector Search
 ↓
-Semantic Retrieval
+Context Retrieval
 ↓
 Qwen 3 (Ollama)
 ↓
 Answer Generation
 
-API Endpoints
-
-POST /upload
-
-Uploads a PDF document, extracts text, generates embeddings, and builds a FAISS index.
-
-POST /chat
-
-Accepts a user question, retrieves relevant document chunks, and generates an answer using Qwen 3.
-
-POST /retrieve
-
-Debug endpoint used to inspect retrieved chunks without invoking the LLM.
-
 Tech Stack
 
-* Python
+Frontend
+
+* React
+* JavaScript
+* CSS
+* Lucide React
+
+Backend
+
 * FastAPI
+* Python
 * Ollama
 * Qwen 3
 * Nomic Embed Text
@@ -61,32 +83,50 @@ Project Structure
 backend/
 ├── main.py
 ├── rag.py
-└── requirements.txt
+├── persistence.py
+├── uploads/
+└── chats.json
+
+frontend/
+├── src/
+├── components/
+└── App.jsx
+
+Key Capabilities
+
+* Workspace isolation
+* Semantic search
+* Document-grounded responses
+* Persistent chat history
+* Persistent PDF storage
+* Source attribution
+* Multi-chat management
 
 Future Improvements
 
-* React Frontend
-* Multi-document Support
-* Persistent FAISS Storage
-* Source Citations
-* Chunk Overlap Retrieval
-* Conversation Memory
-* User Authentication
+* Cloud deployment
+* Streaming responses
+* PDF deletion
+* Authentication
+* Shared workspaces
 
 Status
 
-Current Version: FastAPI RAG Backend ✅
+Current Version: Multi-Workspace PDF RAG Assistant v1.0
 
 Completed:
 
-* PDF Upload
-* Text Extraction
-* Chunking
-* Embeddings
-* FAISS Retrieval
-* RAG Pipeline
-* FastAPI Backend
+* Multi-chat architecture
+* PDF workspace isolation
+* Retrieval-Augmented Generation
+* FAISS vector search
+* Source citations
+* Chat persistence
+* PDF persistence
+* Automatic title generation
+* React frontend
+* FastAPI backend
 
 Next Milestone:
 
-* React Frontend
+* Production deployment
