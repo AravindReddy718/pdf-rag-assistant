@@ -11,6 +11,8 @@ from persistence import (
 
 import faiss
 import numpy as np
+import os
+import shutil
 
 from rag import (
     chunk_text,
@@ -45,6 +47,12 @@ chat_counter = len(
 
 
 app = FastAPI()
+UPLOADS_DIR = "uploads"
+
+os.makedirs(
+    UPLOADS_DIR,
+    exist_ok=True
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -232,6 +240,29 @@ async def upload_pdf_to_chat(
     try:
 
         contents = await file.read()
+        chat_folder = os.path.join(
+            UPLOADS_DIR,
+            chat_id
+        )
+
+        os.makedirs(
+            chat_folder,
+            exist_ok=True
+        )
+
+        pdf_path = os.path.join(
+            chat_folder,
+            file.filename
+        )
+
+        with open(
+            pdf_path,
+            "wb"
+        ) as pdf_file:
+
+            pdf_file.write(
+                contents
+            )
 
         reader = PdfReader(
             BytesIO(contents)
